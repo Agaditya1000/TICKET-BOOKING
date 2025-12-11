@@ -3,7 +3,7 @@ import { Pool, PoolClient } from 'pg';
 import dotenv from 'dotenv';
 dotenv.config();
 
-let pool: Pool | null = null;
+let poolInstance: Pool | null = null;
 
 // Parse and rebuild connection string with decoded password
 // The pg library requires the password to be a plain string, not URL-encoded
@@ -51,7 +51,7 @@ function parseConnectionString(connStr: string) {
 }
 
 function getPool(): Pool {
-  if (!pool) {
+  if (!poolInstance) {
     const connectionString = process.env.DATABASE_URL;
     if (!connectionString) {
       throw new Error('DATABASE_URL environment variable is not set');
@@ -64,9 +64,9 @@ function getPool(): Pool {
       throw new Error('Password must be a string type');
     }
     
-    pool = new Pool(config);
+    poolInstance = new Pool(config);
   }
-  return pool;
+  return poolInstance;
 }
 
 // Export pool getter for backward compatibility
