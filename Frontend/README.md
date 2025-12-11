@@ -214,28 +214,6 @@ TypeScript type checking is integrated into the build process. Run:
 npm run build
 ```
 
-## Deployment
-
-### Build for Production
-
-```bash
-npm run build
-```
-
-The `dist` folder contains the production-ready static files.
-
-### Deploy to Static Hosting
-
-The built files can be deployed to any static hosting service:
-- **Vercel**: `vercel --prod`
-- **Netlify**: Drag and drop `dist` folder
-- **GitHub Pages**: Configure to serve `dist` folder
-- **AWS S3 + CloudFront**: Upload `dist` to S3 bucket
-
-### Environment Variables
-
-For production, set `VITE_API_URL` to your backend API URL.
-
 ## Screenshots
 
 _Note: Add screenshots or GIFs of the application here after testing._

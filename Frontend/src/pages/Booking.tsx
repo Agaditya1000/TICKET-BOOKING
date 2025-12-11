@@ -172,7 +172,6 @@ export const Booking: React.FC = () => {
 
     const seats = selectedShow.seats;
     const seatsPerRow = Math.ceil(Math.sqrt(selectedShow.total_seats));
-    const rows = Math.ceil(seats.length / seatsPerRow);
 
     return (
       <div className="seat-grid-container">

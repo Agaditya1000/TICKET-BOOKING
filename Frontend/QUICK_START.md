@@ -65,3 +65,4 @@
 **Seats not updating:**
 - Booking status is polled every 2 seconds for PENDING bookings
 - Refresh the page to see latest seat availability
+
