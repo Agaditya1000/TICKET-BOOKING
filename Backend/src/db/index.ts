@@ -5,76 +5,47 @@ dotenv.config();
 
 let poolInstance: Pool | null = null;
 
-// Parse and rebuild connection string with decoded password and SSL config
+// Parse and rebuild connection string with decoded password
 // The pg library requires the password to be a plain string, not URL-encoded
 function parseConnectionString(connStr: string) {
   try {
-    // Use URL constructor to properly parse connection string with query parameters
-    const url = new URL(connStr);
-    const password = url.password ? decodeURIComponent(url.password) : '';
+    // Parse the connection string
+    const match = connStr.match(/^postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/);
     
-    // Extract database name (remove leading slash)
-    const database = url.pathname.slice(1).split('?')[0];
-    
-    // Parse query parameters for SSL configuration
-    const sslMode = url.searchParams.get('sslmode') || 'require';
-    const channelBinding = url.searchParams.get('channel_binding');
-    
-    // Configure SSL based on sslmode parameter
-    let sslConfig: any = false;
-    if (sslMode === 'require' || sslMode === 'prefer' || sslMode === 'verify-ca' || sslMode === 'verify-full') {
-      sslConfig = {
-        rejectUnauthorized: sslMode === 'verify-full' || sslMode === 'verify-ca'
+    if (match) {
+      const [, user, encodedPassword, host, port, database] = match;
+      
+      // Decode the URL-encoded password
+      const password = decodeURIComponent(encodedPassword);
+      
+      // Use individual connection parameters (pg handles this better than connection strings with special chars)
+      return {
+        host: host,
+        port: parseInt(port, 10),
+        database: database,
+        user: user,
+        password: password, // Decoded password as plain string
       };
     }
     
-    // Build connection config
-    const config: any = {
-      host: url.hostname,
-      port: parseInt(url.port) || 5432,
-      database: database,
-      user: url.username || 'postgres',
-      password: password,
-    };
-    
-    // Add SSL config if needed
-    if (sslConfig !== false) {
-      config.ssl = sslConfig;
-    }
-    
-    return config;
-  } catch (urlError: any) {
-    // Fallback: try regex parsing for simpler connection strings
+    throw new Error('Connection string format not recognized');
+  } catch (error: any) {
+    // If parsing fails, try to use URL constructor
     try {
-      const match = connStr.match(/^postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/([^?]+)/);
+      const url = new URL(connStr);
+      const password = url.password ? decodeURIComponent(url.password) : '';
       
-      if (match) {
-        const [, user, encodedPassword, host, port, database] = match;
-        const password = decodeURIComponent(encodedPassword);
-        
-        // For Neon and other cloud providers, always use SSL
-        return {
-          host: host,
-          port: parseInt(port, 10),
-          database: database,
-          user: user,
-          password: password,
-          ssl: {
-            rejectUnauthorized: false // Required for Neon
-          }
-        };
-      }
-      
-      throw new Error('Connection string format not recognized');
-    } catch (regexError) {
-      // Last resort: use connection string as-is with SSL
-      console.warn('Using connection string directly with SSL enabled');
-      return { 
-        connectionString: connStr,
-        ssl: {
-          rejectUnauthorized: false
-        }
+      return {
+        host: url.hostname,
+        port: parseInt(url.port) || 5432,
+        database: url.pathname.slice(1),
+        user: url.username || 'postgres',
+        password: password,
       };
+    } catch (urlError) {
+      // Last resort: use connection string as-is
+      console.warn('Using connection string directly (may fail with special characters)');
+      return { connectionString: connStr };
     }
   }
 }
