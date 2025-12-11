@@ -63,3 +63,16 @@ export const pool = new Pool(config);
 export async function getClient(): Promise<PoolClient> {
   return await pool.connect();
 }
+
+// Default export for serverless functions
+export default async function connectDB() {
+  try {
+    const client = await pool.connect();
+    await client.query('SELECT NOW()');
+    client.release();
+    console.log('✅ Database connection successful');
+  } catch (error: any) {
+    console.error('❌ Database connection failed:', error.message);
+    throw error;
+  }
+}
