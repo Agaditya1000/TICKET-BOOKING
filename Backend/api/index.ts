@@ -21,17 +21,22 @@ async function ensureConnected() {
   }
 }
 
-const handler = serverless(app);
+const handler = serverless(app, {
+  binary: ['image/*', 'application/pdf']
+});
 
 export default async function (req: any, res: any) {
   try {
     await ensureConnected();
-    return handler(req, res);
+    return await handler(req, res);
   } catch (error: any) {
     console.error('Function error:', error.message);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: error.message || 'An error occurred',
-    });
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: 'Internal Server Error',
+        message: error.message || 'An error occurred',
+      });
+    }
+    return res;
   }
 }
