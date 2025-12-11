@@ -3,16 +3,35 @@ import app from "../src/app";
 import connectDB from "../src/db";
 
 let connected = false;
+let connectionError: Error | null = null;
+
 async function ensureConnected() {
+  if (connectionError) {
+    throw connectionError;
+  }
   if (!connected) {
-    await connectDB();
-    connected = true;
+    try {
+      await connectDB();
+      connected = true;
+    } catch (error: any) {
+      connectionError = error;
+      console.error('Failed to connect to database:', error.message);
+      throw error;
+    }
   }
 }
 
 const handler = serverless(app);
 
 export default async function (req: any, res: any) {
-  await ensureConnected();
-  return handler(req, res);
+  try {
+    await ensureConnected();
+    return handler(req, res);
+  } catch (error: any) {
+    console.error('Function error:', error.message);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message || 'An error occurred',
+    });
+  }
 }

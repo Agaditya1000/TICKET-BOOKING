@@ -3,8 +3,7 @@ import { Pool, PoolClient } from 'pg';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const connectionString = process.env.DATABASE_URL!;
-if (!connectionString) throw new Error('DATABASE_URL not set');
+let pool: Pool | null = null;
 
 // Parse and rebuild connection string with decoded password
 // The pg library requires the password to be a plain string, not URL-encoded
@@ -51,23 +50,41 @@ function parseConnectionString(connStr: string) {
   }
 }
 
-const config = parseConnectionString(connectionString);
-
-// Validate password is a string
-if ('password' in config && typeof config.password !== 'string') {
-  throw new Error('Password must be a string type');
+function getPool(): Pool {
+  if (!pool) {
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error('DATABASE_URL environment variable is not set');
+    }
+    
+    const config = parseConnectionString(connectionString);
+    
+    // Validate password is a string
+    if ('password' in config && typeof config.password !== 'string') {
+      throw new Error('Password must be a string type');
+    }
+    
+    pool = new Pool(config);
+  }
+  return pool;
 }
 
-export const pool = new Pool(config);
+// Export pool getter for backward compatibility
+export const pool = {
+  connect: () => getPool().connect(),
+  query: (text: string, params?: any) => getPool().query(text, params),
+  end: () => getPool().end(),
+};
 
 export async function getClient(): Promise<PoolClient> {
-  return await pool.connect();
+  return await getPool().connect();
 }
 
 // Default export for serverless functions
 export default async function connectDB() {
   try {
-    const client = await pool.connect();
+    const poolInstance = getPool();
+    const client = await poolInstance.connect();
     await client.query('SELECT NOW()');
     client.release();
     console.log('✅ Database connection successful');
