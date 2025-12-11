@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import type { Show, Booking, CreateShowInput, CreateBookingInput } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ticket-booking-psx5.vercel.app/';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ticket-booking-cr0y.onrender.com';
 
 class ApiService {
   private client: AxiosInstance;
