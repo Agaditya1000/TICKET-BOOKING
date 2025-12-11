@@ -1,0 +1,141 @@
+{
+  "info": {
+    "name": "Ticket Booking System API",
+    "description": "API collection for Ticket Booking System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Shows",
+      "item": [
+        {
+          "name": "Create Show",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Morning Bus to Mumbai\",\n  \"start_time\": \"2024-12-25T08:00:00Z\",\n  \"total_seats\": 40\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/shows",
+              "host": ["{{base_url}}"],
+              "path": ["api", "shows"]
+            }
+          }
+        },
+        {
+          "name": "List Shows",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/shows",
+              "host": ["{{base_url}}"],
+              "path": ["api", "shows"]
+            }
+          }
+        },
+        {
+          "name": "Get Show Details",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/shows/:showId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "shows", ":showId"],
+              "variable": [
+                {
+                  "key": "showId",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": null,\n  \"show_id\": \"\",\n  \"seat_numbers\": [\"1\", \"2\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/bookings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "bookings"]
+            }
+          }
+        },
+        {
+          "name": "Get Booking",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/bookings/:bookingId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "bookings", ":bookingId"],
+              "variable": [
+                {
+                  "key": "bookingId",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Confirm Booking",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/bookings/:bookingId/confirm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "bookings", ":bookingId", "confirm"],
+              "variable": [
+                {
+                  "key": "bookingId",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:4000"
+    }
+  ]
+}
+
