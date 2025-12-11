@@ -1,7 +1,3 @@
-// Simple serverless handler for Vercel (optional - only needed for deployment)
-import serverless from "serverless-http";
-import app from "../src/app";
-
-const handler = serverless(app);
-
-export default handler;
+// Serverless handler (optional - for future deployment if needed)
+// This file is not used for local development
+// Local development uses src/index.ts directly
