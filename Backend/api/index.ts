@@ -1,6 +1,6 @@
-﻿import serverless from "serverless-http";
+import serverless from "serverless-http";
 import app from "../src/app";
-import connectDB from "../src/db"; // uses your existing src/db/index.ts
+import connectDB from "../src/db";
 
 let connected = false;
 async function ensureConnected() {
